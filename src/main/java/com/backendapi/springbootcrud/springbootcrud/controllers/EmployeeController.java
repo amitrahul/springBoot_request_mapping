@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /*
  * -> @RestController :-
@@ -62,8 +64,19 @@ public class EmployeeController {
         return employeeService.createNewEmployee(employeeInput);
     }
 
-    @PutMapping
-    public String updateEmployeeById(){
-        return "employee update through put";
+    @PutMapping(path = "/{employeeId}")
+    public EmployeeDTO updateEmployeeById(@RequestBody EmployeeDTO employeeDto , @PathVariable Long employeeId){
+        return employeeService.updateEmployeeById(employeeId , employeeDto);
+    }
+
+    @DeleteMapping(path = "/{employeeId}")
+    public boolean deleteEmployeeById(@PathVariable Long employeeId){
+       return employeeService.deleteEmployeeId(employeeId);
+    }
+
+    @PatchMapping(path = "/{employeeId}")
+    public EmployeeDTO updatePartialEmployeeById(@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
+        return employeeService.updatePartialEmployeeById(employeeId,updates);
     }
 }
+

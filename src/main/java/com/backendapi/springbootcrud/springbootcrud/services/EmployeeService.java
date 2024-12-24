@@ -4,9 +4,12 @@ import com.backendapi.springbootcrud.springbootcrud.dto.EmployeeDTO;
 import com.backendapi.springbootcrud.springbootcrud.entites.EmployeeEntity;
 import com.backendapi.springbootcrud.springbootcrud.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,4 +56,34 @@ public class EmployeeService {
         return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
     }
 
+    public EmployeeDTO updateEmployeeById(Long employeeId, EmployeeDTO employeeDto) {
+      EmployeeEntity employeeEntity =  modelMapper.map(employeeDto, EmployeeEntity.class);
+      employeeEntity.setId(employeeId);
+      EmployeeEntity savedEmployeeEntity = employeeRepository.save(employeeEntity);
+      return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
+    }
+
+    public boolean isExistByEmployeeId(Long employeeId){
+        return employeeRepository.existsById(employeeId);
+    }
+
+    public boolean deleteEmployeeId(Long employeeId) {
+        boolean exists = isExistByEmployeeId(employeeId);
+        if(!exists) return  false;
+        employeeRepository.deleteById(employeeId);
+        return true;
+    }
+
+
+    public EmployeeDTO updatePartialEmployeeById(Long employeeId, Map<String, Object> updates) {
+        boolean exists = isExistByEmployeeId(employeeId);
+        if(!exists) return null;
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get();
+        updates.forEach((field,value) -> {
+           Field fieldToBeUpdated = ReflectionUtils.findRequiredField(EmployeeEntity.class,field);
+           fieldToBeUpdated.setAccessible(true);
+           ReflectionUtils.setField(fieldToBeUpdated, employeeEntity , value);
+        });
+        return modelMapper.map(employeeRepository.save(employeeEntity), EmployeeDTO.class);
+    }
 }
