@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +25,8 @@ public class EmployeeService {
         this.modelMapper = modelMapper;
     }
 
-    public EmployeeDTO getEmployeeById(Long id) {
-        EmployeeEntity employeeEntity =  employeeRepository.findById(id).orElse(null);
+    public Optional<EmployeeDTO>  getEmployeeById(Long id) {
+//        EmployeeEntity employeeEntity =  employeeRepository.findById(id).orElse(null);
         /*
         * instead of return through object creating, we can achieve same thing from model mapper library.
         * bcz each time create object will be difficult one.
@@ -39,7 +40,13 @@ public class EmployeeService {
 //        instead of creating ModelMapper object each time, we are creating beans of it, in config package.
 
 
-       return modelMapper.map(employeeEntity , EmployeeDTO.class);
+//       return modelMapper.map(employeeEntity , EmployeeDTO.class);
+
+//        Optional<EmployeeEntity> employeeEntity = employeeRepository.findById(id);
+//        return employeeEntity.map(employeeEntity1 -> modelMapper.map(employeeEntity1, EmployeeDTO.class));
+
+//        in one line we can also write same thing as:-
+       return employeeRepository.findById(id).map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class));
     }
 
     public List<EmployeeDTO> getAllEmployee() {

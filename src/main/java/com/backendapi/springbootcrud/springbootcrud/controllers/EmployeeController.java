@@ -4,12 +4,15 @@ import com.backendapi.springbootcrud.springbootcrud.dto.EmployeeDTO;
 import com.backendapi.springbootcrud.springbootcrud.entites.EmployeeEntity;
 import com.backendapi.springbootcrud.springbootcrud.repositories.EmployeeRepository;
 import com.backendapi.springbootcrud.springbootcrud.services.EmployeeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /*
  * -> @RestController :-
@@ -40,43 +43,61 @@ public class EmployeeController {
 //        return  "secret message : hike increased to shdjs";
 //    }
     @GetMapping(path = "/{employeeId}")
-    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long id) {
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(name = "employeeId") Long id) {
 //        return new EmployeeDTO(id, "raj", "raj@gmail.com", 27, LocalDate.of(2024, 1, 2), true);
 //        return employeeRepository.findById(id).orElse(null);
-        return employeeService.getEmployeeById(id);
+        Optional<EmployeeDTO> employeeDTO = employeeService.getEmployeeById(id);
+        return employeeDTO
+                .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
+                .orElse(ResponseEntity.notFound().build());
     }
 
 //    @GetMapping(path = "/employees")
     @GetMapping
-    public List<EmployeeDTO> getAllEmployee(@RequestParam(required = false , name = "inputAge") Integer age,
+    public ResponseEntity<List<EmployeeDTO> > getAllEmployee(@RequestParam(required = false , name = "inputAge") Integer age,
                                                @RequestParam(required = false) String sortBy) {
 //        return "age is " + age + " " + sortBy;
 //        return employeeRepository.findAll();
-        return employeeService.getAllEmployee();
+//        return employeeService.getAllEmployee();
+        return ResponseEntity.ok(employeeService.getAllEmployee());
     }
 
 
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO employeeInput){
+    public ResponseEntity<EmployeeDTO>  createNewEmployee(@RequestBody EmployeeDTO employeeInput){
 //        employeeInput.setId(120L);
 //        return employeeInput;
 //        return employeeRepository.save(employeeInput);
-        return employeeService.createNewEmployee(employeeInput);
+//        return employeeService.createNewEmployee(employeeInput);
+        EmployeeDTO savedEmployee = employeeService.createNewEmployee(employeeInput);
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{employeeId}")
-    public EmployeeDTO updateEmployeeById(@RequestBody EmployeeDTO employeeDto , @PathVariable Long employeeId){
-        return employeeService.updateEmployeeById(employeeId , employeeDto);
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@RequestBody EmployeeDTO employeeDto , @PathVariable Long employeeId){
+//        return employeeService.updateEmployeeById(employeeId , employeeDto);
+        return ResponseEntity.ok(employeeService.updateEmployeeById(employeeId , employeeDto));
     }
 
     @DeleteMapping(path = "/{employeeId}")
-    public boolean deleteEmployeeById(@PathVariable Long employeeId){
-       return employeeService.deleteEmployeeId(employeeId);
+    public ResponseEntity<Boolean> deleteEmployeeById(@PathVariable Long employeeId){
+//       return employeeService.deleteEmployeeId(employeeId);
+        boolean gotDeletedUser = employeeService.deleteEmployeeId(employeeId);
+        if(gotDeletedUser)
+            return ResponseEntity.ok(gotDeletedUser);
+        return ResponseEntity.notFound().build();
     }
 
+
     @PatchMapping(path = "/{employeeId}")
-    public EmployeeDTO updatePartialEmployeeById(@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
-        return employeeService.updatePartialEmployeeById(employeeId,updates);
+    public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
+//        return employeeService.updatePartialEmployeeById(employeeId,updates);
+
+       EmployeeDTO employeeDTO = employeeService.updatePartialEmployeeById(employeeId,updates);
+       if(employeeDTO == null)
+           return ResponseEntity.notFound().build();
+       return ResponseEntity.ok(employeeDTO);
     }
+
 }
 
