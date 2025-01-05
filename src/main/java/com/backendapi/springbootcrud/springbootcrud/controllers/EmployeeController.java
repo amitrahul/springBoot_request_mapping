@@ -4,6 +4,7 @@ import com.backendapi.springbootcrud.springbootcrud.dto.EmployeeDTO;
 import com.backendapi.springbootcrud.springbootcrud.entites.EmployeeEntity;
 import com.backendapi.springbootcrud.springbootcrud.repositories.EmployeeRepository;
 import com.backendapi.springbootcrud.springbootcrud.services.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,8 +64,9 @@ public class EmployeeController {
     }
 
 
+    // @Valid annotation, used to validate the controller, is EmployeeDTO taking correct or mandatory i/p from user.
     @PostMapping
-    public ResponseEntity<EmployeeDTO>  createNewEmployee(@RequestBody EmployeeDTO employeeInput){
+    public ResponseEntity<EmployeeDTO>  createNewEmployee(@RequestBody @Valid EmployeeDTO employeeInput){
 //        employeeInput.setId(120L);
 //        return employeeInput;
 //        return employeeRepository.save(employeeInput);
@@ -74,7 +76,7 @@ public class EmployeeController {
     }
 
     @PutMapping(path = "/{employeeId}")
-    public ResponseEntity<EmployeeDTO> updateEmployeeById(@RequestBody EmployeeDTO employeeDto , @PathVariable Long employeeId){
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@RequestBody @Valid EmployeeDTO employeeDto , @PathVariable Long employeeId){
 //        return employeeService.updateEmployeeById(employeeId , employeeDto);
         return ResponseEntity.ok(employeeService.updateEmployeeById(employeeId , employeeDto));
     }
