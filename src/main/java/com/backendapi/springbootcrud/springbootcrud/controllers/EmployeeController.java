@@ -2,18 +2,17 @@ package com.backendapi.springbootcrud.springbootcrud.controllers;
 
 import com.backendapi.springbootcrud.springbootcrud.dto.EmployeeDTO;
 import com.backendapi.springbootcrud.springbootcrud.entites.EmployeeEntity;
+import com.backendapi.springbootcrud.springbootcrud.exception.ResourceNotFoundException;
 import com.backendapi.springbootcrud.springbootcrud.repositories.EmployeeRepository;
 import com.backendapi.springbootcrud.springbootcrud.services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /*
  * -> @RestController :-
@@ -50,8 +49,10 @@ public class EmployeeController {
         Optional<EmployeeDTO> employeeDTO = employeeService.getEmployeeById(id);
         return employeeDTO
                 .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
-                .orElse(ResponseEntity.notFound().build());
+//                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ResourceNotFoundException("employee not found with id " + id));
     }
+
 
 //    @GetMapping(path = "/employees")
     @GetMapping
